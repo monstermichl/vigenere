@@ -64,6 +64,7 @@ if __name__ == '__main__':
         original_input = f.read().upper()
         input          = ''.join([c for c in original_input if c in ALPHABET]).upper()
 
+    # try different key lengths
     for length in args.length:
         key = ''
 
@@ -94,23 +95,25 @@ if __name__ == '__main__':
             # sort alphabet
             sorted_frequencies = sort_by_key(collected_frequencies)
 
-            deque_collected_chars       = deque(char      for char      in sorted_frequencies.keys())
+            deque_collected_chars       = deque(char      for char      in sorted_frequencies.keys  ())
             deque_collected_frequencies = deque(frequency for frequency in sorted_frequencies.values())
 
             # collect probabilities
             probabilities        = {}
             language_frequencies = FREQUENCIES[args.lang]
 
+            # calculate all probabilities
             for shift in range(0, len(language_frequencies)):
                 probabilities[shift] = 0
 
                 for i in range(0, len(deque_collected_frequencies)):
                     probabilities[shift] += deque_collected_frequencies[i] * language_frequencies[i]
 
+                # rotate to get calculate next probabilities
                 deque_collected_chars      .rotate(-1)
                 deque_collected_frequencies.rotate(-1)
 
-            # sort probabilities to get the most probable
+            # sort probabilities to get the most probable letter
             sorted_probabilities = sort_by_value(probabilities)
 
             # convert shift index with most probability to letter and add to key
