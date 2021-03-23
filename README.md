@@ -1,5 +1,5 @@
 # vigenere
-Script which tries to decipher Vigenere ciphers based on the given key lengths.
+script which tries to decipher Vigenere ciphers based on the given key lengths.
 
-# Side note
-Doesn't work properly yet :)
+## side note
+doesn't work properly yet :)
