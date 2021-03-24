@@ -11,6 +11,26 @@ FREQUENCIES = {
     LANG_DE: [6.47, 1.93, 2.68, 4.83, 17.48, 1.65, 3.06, 4.23, 7.73, 0.27, 1.46, 3.39, 2.58, 9.84, 2.98, 0.96, 0.02, 7.54, 6.83, 6.13, 4.17, 0.94, 1.48, 0.04, 0.08, 1.14],
     LANG_EN: [8.12, 1.49, 2.71, 4.32, 12.02, 2.30, 2.03, 5.92, 7.31, 0.10, 0.69, 3.98, 2.61, 6.95, 7.68, 1.82, 0.11, 6.02, 6.28, 9.10, 2.88, 1.11, 2.09, 0.17, 2.11, 0.07]
 }
+FREQUENCIES_WORDS = {
+    LANG_DE: [
+        'der', 'die', 'und', 'in', 'den', 'von', 'zu', 'das', 'mit', 'sich', 'des', 'auf', 'für', 'ist', 'im', 'dem',
+        'nicht', 'ein', 'Die', 'eine', 'als', 'auch', 'es', 'an', 'werden', 'aus', 'er', 'hat', 'dass', 'sie', 'nach',
+        'wird', 'bei', 'einer', 'Der', 'um', 'am', 'sind', 'noch', 'wie', 'einem', 'über', 'einen', 'Das', 'so', 'Sie',
+        'zum', 'war', 'haben', 'nur', 'oder', 'aber', 'vor', 'zur', 'bis', 'mehr', 'durch', 'man', 'sein', 'wurde',
+        'sei', 'Prozent', 'hatte', 'kann', 'gegen', 'vom', 'können', 'schon', 'wenn', 'habe', 'seine', 'Mark', 'ihre',
+        'dann', 'unter', 'wir', 'soll', 'ich', 'eines', 'Es', 'Jahr', 'zwei', 'Jahren', 'diese', 'dieser', 'wieder',
+        'keine', 'Uhr','seiner', 'worden', 'Und', 'will', 'zwischen', 'Im', 'immer', 'Millionen', 'Ein', 'was', 'sagte'
+    ],
+    LANG_EN: [
+        'the', 'be', 'to', 'of', 'and', 'in', 'that', 'have', 'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do',
+        'at', 'this', 'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her', 'she', 'or', 'an', 'will', 'my', 'one',
+        'all', 'would', 'there', 'their', 'what', 'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go', 'me',
+        'when', 'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know', 'take', 'people', 'into', 'year', 'your',
+        'good', 'some', 'could', 'them', 'see', 'other', 'than', 'then', 'now', 'look', 'only', 'come', 'its', 'over',
+        'think', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new',
+        'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us'
+    ]
+}
 
 
 def letter_to_number(letter: chr):
@@ -50,6 +70,13 @@ def decode(cipher: str, key: str):
     return plain
 
 
+def words_by_length(language: str):
+    words = []
+    if language in FREQUENCIES_WORDS:
+        words = sorted([word.upper() for word in FREQUENCIES_WORDS[language]], key=lambda word: len(word), reverse=True)
+    return words
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
@@ -63,6 +90,9 @@ if __name__ == '__main__':
     with open(args.input, 'r') as f:
         original_input = f.read().upper()
         input          = ''.join([c for c in original_input if c in ALPHABET]).upper()
+
+    # get language words
+    language_words = words_by_length(args.lang)
 
     # try different key lengths
     for length in args.length:
@@ -120,8 +150,20 @@ if __name__ == '__main__':
             first_key = list(sorted_probabilities.keys())[0]
             key += ALPHABET[first_key]
 
+        # get plain text
+        plain_text = decode(original_input, key)
+
         # output result
         print('-' * 30)
         print(f'Key length: {length}')
         print(f'Key: {key}')
-        print(f'Plain text: {decode(original_input, key)}')
+        print(f'Plain text: {plain_text}')
+
+        # get possible words in plain text
+        found_words = []
+        for word in language_words:
+            if word in plain_text:
+                found_words.append(word)
+        found_words = list(set(found_words))
+
+        print(f'Found words ({len(found_words)}): %s' % ', '.join(found_words))
